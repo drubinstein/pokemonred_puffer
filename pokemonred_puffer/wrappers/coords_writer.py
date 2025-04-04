@@ -1,6 +1,7 @@
 import base64
 import collections
 import io
+import json
 import os
 from datetime import datetime
 from typing import cast
@@ -77,6 +78,10 @@ class ActionsWriter(gym.Wrapper):
         os.makedirs(self.output_dir, exist_ok=True)
         self.writer = open(self.write_path, "wb")
         self.writer.write(b"")
+
+        # Write the current config to the directory as a backup
+        with open(os.path.join(self.output_dir, "config.json"), "w") as f:
+            json.dump(dict(config), f)
 
     def step(self, action):
         self.action_list.append(action)
