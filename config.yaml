@@ -238,7 +238,7 @@ wrappers:
         jitter: 0
 
   stream_only_with_coords:
-    - coords_writer.ActionWriter:
+    - coords_writer.ActionsWriter:
         output_dir: runs
         write_frequency: 1000
     - coords_writer.CoordinatesWriter:
