@@ -50,6 +50,8 @@ class CoordinatesWriter(gym.Wrapper):
 
     def reset(self, *args, **kwargs):
         self.write()
+        if "seed" in kwargs:
+            del kwargs["seed"]
         return self.env.reset(*args, **kwargs)
 
     def close(self):
@@ -95,6 +97,8 @@ class ActionsWriter(gym.Wrapper):
         # Now write the save state update
         env = cast(RedGymEnv, self.env)
         # this will not work well with random seeding
+        if "seed" in kwargs:
+            del kwargs["seed"]
         res = env.reset(self, *args, **kwargs)
         state = io.BytesIO()
         env.pyboy.save_state(state)
