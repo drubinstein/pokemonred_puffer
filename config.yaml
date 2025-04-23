@@ -182,10 +182,10 @@ train:
   # we early stop
   # The defaults have a margin of error
   early_stop:
-    EVENT_BEAT_BROCK: 30
-    EVENT_BEAT_MISTY: 300
-    EVENT_GOT_HM01: 600
-    EVENT_BEAT_LT_SURGE: 1200
+    EVENT_BEAT_BROCK: 60
+    EVENT_BEAT_MISTY: 600
+    EVENT_GOT_HM01: 1200
+    EVENT_BEAT_LT_SURGE: 2400
   # If set, train until all events are accomplished.
   one_epoch:
     - "EVENT_BEAT_CHAMPION_RIVAL"
@@ -238,14 +238,17 @@ wrappers:
         jitter: 0
 
   stream_only_with_coords:
+    - coords_writer.ActionWriter:
+        output_dir: runs
+        write_frequency: 1000
     - coords_writer.CoordinatesWriter:
         output_dir: runs
         write_frequency: 1000
     - stream_wrapper.StreamWrapper:
         user: thatguy
     - exploration.OnResetExplorationWrapper:
-        full_reset_frequency: 1
-        jitter: 1
+        full_reset_frequency: 10
+        jitter: 5
 
   stream_only:
     - stream_wrapper.StreamWrapper:
@@ -438,7 +441,7 @@ rewards:
       pokeflute_tiles: 0.9939162135124208
       required_event: 7.134671688079834
       required_item: 3.3519155979156494
-      safari_zone: 10.2822847366333
+      safari_zone: 55.1411423683 # (100.0 + 10.2822847366)/2
       seen_action_bag_menu: 0.0
       seen_pokemon: 2.1898984909057617
       start_menu: 0.010755150794982913

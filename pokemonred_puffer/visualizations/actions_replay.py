@@ -4,6 +4,7 @@ import os
 
 import mediapy
 from omegaconf import OmegaConf
+from tqdm import tqdm
 
 from pokemonred_puffer.environment import RedGymEnv
 from pokemonred_puffer.rewards.baseline import ObjectRewardRequiredEventsMapIdsFieldMoves
@@ -30,6 +31,12 @@ def main():
         env_id, _ = path.split("-")
         # The config must match what was used for training
         output_file = os.path.join(args.output_dir, f"actions-{env_id}.mp4")
+
+        # read the file once to get the total number of lines
+        n_lines = 0
+        with open(os.path.join(args.actions_dir, path)) as f:
+            for line in f:
+                n_lines += 1
         with (
             open(os.path.join(args.actions_dir, path)) as f,
             mediapy.VideoWriter(output_file, (144, 160), fps=60) as writer,
@@ -45,7 +52,7 @@ def main():
             env.reset()
             writer.add_image(env.render()[:, :])
             # Read lines so we can get an estimate of the line count
-            for line in f:
+            for line in tqdm(f, total=n_lines):
                 line = line.strip()
                 if len(line) == 1:
                     process_action(env, int(line))

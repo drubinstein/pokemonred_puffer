@@ -413,7 +413,12 @@ class ObjectRewardRequiredEventsMapIds(BaselineRewardEnv):
                     self.reward_config["safari_zone"] * v for k, v in self.safari_zone_steps.items()
                 )
                 / 502.0,
-                "use_ball_count": self.reward_config["use_ball_count"] * self.use_ball_count,
+                "use_ball_count": (
+                    0
+                    if self.flags.get_bit("BIT_GOT_LAPRAS")
+                    else self.reward_config["use_ball_count"]
+                )
+                * self.use_ball_count,
                 "pokeflute_tiles": self.reward_config["pokeflute_tiles"]
                 * sum(self.pokeflute_tiles.values()),
                 "surf_tiles": self.reward_config["surf_tiles"] * sum(self.surf_tiles.values()),
