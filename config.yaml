@@ -40,12 +40,12 @@ env:
   auto_teach_cut: False
   # If true, use cut when standing next to a tree.
   auto_use_cut: False
+  # If true, use surf when attempting to walk on water.
+  auto_use_surf: False
+  # If true, teach surf if possible.
+  auto_teach_surf: False
   # If true, use strength when walking into a cave if possible.
   auto_use_strength: True
-  # If true, use surf when attempting to walk on water.
-  auto_use_surf: True
-  # If true, teach surf if possible.
-  auto_teach_surf: True
   # If true, teach strength if possible.
   auto_teach_strength: True
   # If true, solve a strength puzzle if next to a moveable boulder.
