@@ -1667,14 +1667,24 @@ class RedGymEnv(Env):
             self.exploration_max,
         )
         # TODO: Turn into a wrapper?
-        self.explore_map[local_to_global(y_pos, x_pos, map_n)] = min(
-            self.explore_map[local_to_global(y_pos, x_pos, map_n)] + inc,
+        global_coord = local_to_global(y_pos, x_pos, map_n)
+        self.explore_map[global_coord] = min(
+            self.explore_map[global_coord] + inc,
             self.exploration_max,
         )
-        self.reward_explore_map[local_to_global(y_pos, x_pos, map_n)] = min(
-            self.explore_map[local_to_global(y_pos, x_pos, map_n)] + inc,
+        self.reward_explore_map[global_coord] = min(
+            self.explore_map[global_coord] + inc,
             self.exploration_max,
         ) * (self.map_id_scalefactor if self.scale_map_id(map_n) else 1.0)
+        # Disable exploration rewards for safari zone
+        if MapIds(map_n) in [
+            MapIds.SAFARI_ZONE_CENTER,
+            MapIds.SAFARI_ZONE_EAST,
+            MapIds.SAFARI_ZONE_NORTH,
+            MapIds.SAFARI_ZONE_WEST,
+        ]:
+            self.reward_explore_map[global_coord] = 0
+
         # self.seen_global_coords[local_to_global(y_pos, x_pos, map_n)] = 1
         self.seen_map_ids[map_n] = 1
 
