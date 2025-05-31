@@ -29,6 +29,12 @@ from pokemonred_puffer.wrappers.sqlite import SqliteStateResetWrapper
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
+DEFAULT_CONFIG = "config.yaml"
+DEFAULT_POLICY = "multi_convolutional.MultiConvolutionalPolicy"
+DEFAULT_REWARD = "baseline.ObjectRewardRequiredEventsMapIdsFieldMoves"
+DEFAULT_WRAPPER = "stream_only"
+DEFAULT_ROM = "red.gb"
+
 
 class Vectorization(Enum):
     multiprocessing = "multiprocessing"
@@ -189,7 +195,7 @@ def setup(
 def evaluate(
     config: Annotated[
         DictConfig, typer.Option(help="Base configuration", parser=OmegaConf.load)
-    ] = "config.yaml",
+    ] = DEFAULT_CONFIG,
     checkpoint_path: Path | None = None,
     policy_name: Annotated[
         str,
@@ -198,7 +204,7 @@ def evaluate(
             "-p",
             help="Policy module to use in policies.",
         ),
-    ] = "multi_convolutional.MultiConvolutionalPolicy",
+    ] = DEFAULT_POLICY,
     reward_name: Annotated[
         str,
         typer.Option(
@@ -206,7 +212,7 @@ def evaluate(
             "-r",
             help="Reward module to use in rewards",
         ),
-    ] = "baseline.BaselineRewardEnv",
+    ] = DEFAULT_REWARD,
     wrappers_name: Annotated[
         str,
         typer.Option(
@@ -214,8 +220,8 @@ def evaluate(
             "-w",
             help="Wrappers to use _in order of instantion_",
         ),
-    ] = "baseline",
-    rom_path: Path = "red.gb",
+    ] = DEFAULT_WRAPPER,
+    rom_path: Path = DEFAULT_ROM,
 ):
     config, env_creator = setup(
         config=config,
@@ -246,7 +252,7 @@ def evaluate(
 def autotune(
     config: Annotated[
         DictConfig, typer.Option(help="Base configuration", parser=OmegaConf.load)
-    ] = "config.yaml",
+    ] = DEFAULT_CONFIG,
     policy_name: Annotated[
         str,
         typer.Option(
@@ -254,7 +260,7 @@ def autotune(
             "-p",
             help="Policy module to use in policies.",
         ),
-    ] = "multi_convolutional.MultiConvolutionalPolicy",
+    ] = DEFAULT_POLICY,
     reward_name: Annotated[
         str,
         typer.Option(
@@ -262,7 +268,7 @@ def autotune(
             "-r",
             help="Reward module to use in rewards",
         ),
-    ] = "baseline.ObjectRewardRequiredEventsMapIds",
+    ] = DEFAULT_REWARD,
     wrappers_name: Annotated[
         str,
         typer.Option(
@@ -271,7 +277,7 @@ def autotune(
             help="Wrappers to use _in order of instantion_",
         ),
     ] = "empty",
-    rom_path: Path = "red.gb",
+    rom_path: Path = DEFAULT_ROM,
 ):
     config = load_from_config(config, False)
     config.vectorization = "multiprocessing"
@@ -298,7 +304,7 @@ def autotune(
 def debug(
     config: Annotated[
         DictConfig, typer.Option(help="Base configuration", parser=OmegaConf.load)
-    ] = "config.yaml",
+    ] = DEFAULT_CONFIG,
     reward_name: Annotated[
         str,
         typer.Option(
@@ -306,7 +312,7 @@ def debug(
             "-r",
             help="Reward module to use in rewards",
         ),
-    ] = "baseline.ObjectRewardRequiredEventsMapIdsFieldMoves",
+    ] = DEFAULT_REWARD,
     wrappers_name: Annotated[
         str,
         typer.Option(
@@ -315,7 +321,7 @@ def debug(
             help="Wrappers to use _in order of instantion_",
         ),
     ] = "empty",
-    rom_path: Path = "red.gb",
+    rom_path: Path = DEFAULT_ROM,
 ):
     config = load_from_config(config, True)
     config.env.gb_path = rom_path
@@ -342,7 +348,7 @@ def debug(
 def train(
     config: Annotated[
         DictConfig, typer.Option(help="Base configuration", parser=OmegaConf.load)
-    ] = "config.yaml",
+    ] = DEFAULT_CONFIG,
     policy_name: Annotated[
         str,
         typer.Option(
@@ -350,7 +356,7 @@ def train(
             "-p",
             help="Policy module to use in policies.",
         ),
-    ] = "multi_convolutional.MultiConvolutionalPolicy",
+    ] = DEFAULT_POLICY,
     reward_name: Annotated[
         str,
         typer.Option(
@@ -358,7 +364,7 @@ def train(
             "-r",
             help="Reward module to use in rewards",
         ),
-    ] = "baseline.ObjectRewardRequiredEventsMapIdsFieldMoves",
+    ] = DEFAULT_REWARD,
     wrappers_name: Annotated[
         str,
         typer.Option(
@@ -366,9 +372,9 @@ def train(
             "-w",
             help="Wrappers to use _in order of instantion_",
         ),
-    ] = "stream_only",
+    ] = DEFAULT_WRAPPER,
     exp_name: Annotated[str | None, typer.Option(help="Resume from experiment")] = None,
-    rom_path: Path = "red.gb",
+    rom_path: Path = DEFAULT_ROM,
     track: Annotated[bool, typer.Option(help="Track on wandb.")] = False,
     debug: Annotated[bool, typer.Option(help="debug")] = False,
     vectorization: Annotated[
