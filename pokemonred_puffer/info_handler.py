@@ -56,6 +56,7 @@ class StateManager:
             if k.startswith("state/"):
                 key_str = k.split("/")[-1]
                 key: tuple[str] = ast.literal_eval(key_str)
+                v = tuple(v)
                 self.states[key].append(v)
                 if self.archive_states:
                     state_dir = self.archive_path / str(hash(key))
@@ -232,7 +233,7 @@ class StateManager:
                     and len(candidate_max_state) == candidate_max_state.maxlen
                 ):
                     max_event_count = len(key)
-                    new_state_key = key
+                    new_state_key = tuple(key)
                     max_state = candidate_max_state
             if max_event_count > self.max_event_count and max_state:
                 self.max_event_count = max_event_count
