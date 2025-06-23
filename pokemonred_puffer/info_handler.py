@@ -56,7 +56,6 @@ class StateManager:
             if k.startswith("state/"):
                 key_str = k.split("/")[-1]
                 key: tuple[str] = ast.literal_eval(key_str)
-                v = tuple(v)
                 self.states[key].append(v)
                 if self.archive_states:
                     state_dir = self.archive_path / str(hash(key))
@@ -65,7 +64,8 @@ class StateManager:
                         with open(state_dir / "desc.txt", "w") as f:
                             f.write(str(key))
                     with open(state_dir / f"{hash(v)}.state", "wb") as f:
-                        f.write(v)
+                        # take any of the states
+                        f.write(v[0])
             elif "stats/required_count" == k:
                 for count, eid in zip(v, env_ids):
                     self.event_tracker[eid] = max(self.event_tracker.get(eid, 0), count)
