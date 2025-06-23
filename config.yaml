@@ -109,6 +109,7 @@ train:
   batch_size: 65536
   # The number of example to train for one batch of training.
   minibatch_size: 2048
+  max_minibatch_size: 2048
   # If true, turn on learning rate annealing.
   anneal_lr: False
   # Unused
