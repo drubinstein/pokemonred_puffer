@@ -18,11 +18,10 @@ def one_hot(tensor, num_classes):
 
 
 class MultiConvolutionalRNN(pufferlib.models.LSTMWrapper):
-    def __init__(self, env, policy, input_size=512, hidden_size=512, num_layers=1):
-        super().__init__(env, policy, input_size, hidden_size, num_layers)
+    pass
 
 
-# We dont inherit from the pufferlib convolutional because we wont be able
+# We dont inherit from the pufferlib convolutional beause we wont be able
 # to easily call its __init__ due to our usage of lazy layers
 # All that really means is a slightly different forward
 class MultiConvolutionalPolicy(nn.Module):
@@ -34,6 +33,7 @@ class MultiConvolutionalPolicy(nn.Module):
         downsample: int = 1,
     ):
         super().__init__()
+        self.is_continuous = False
         self.dtype = pufferlib.pytorch.nativize_dtype(env.emulated)
         self.num_actions = env.single_action_space.n
         self.channels_last = channels_last
@@ -125,11 +125,11 @@ class MultiConvolutionalPolicy(nn.Module):
         self.event_embeddings = nn.Embedding(n_events, int(n_events**0.25) + 1, dtype=torch.float32)
 
     def forward(self, observations):
-        hidden, lookup = self.encode_observations(observations)
-        actions, value = self.decode_actions(hidden, lookup)
+        hidden = self.encode_observations(observations)
+        actions, value = self.decode_actions(hidden)
         return actions, value
 
-    def encode_observations(self, observations):
+    def encode_observations(self, observations, state=None):
         observations = observations.type(torch.uint8)  # Undo bad cleanrl cast
         observations = pufferlib.pytorch.nativize_tensor(observations, self.dtype)
 
@@ -262,9 +262,9 @@ class MultiConvolutionalPolicy(nn.Module):
             ),
             dim=-1,
         )
-        return self.encode_linear(cat_obs), None
+        return self.encode_linear(cat_obs)
 
-    def decode_actions(self, flat_hidden, lookup, concat=None):
+    def decode_actions(self, flat_hidden, concat=None):
         action = self.actor(flat_hidden)
         value = self.value_fn(flat_hidden)
         return action, value

@@ -216,7 +216,7 @@ class RedGymEnv(Env):
             "type2": spaces.Box(low=0, high=0x1A, shape=(6,), dtype=np.uint8),
             "level": spaces.Box(low=0, high=100, shape=(6,), dtype=np.uint8),
             "maxHP": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
-            "attack": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
+            "attack": spaces.Box(low=0, high=4000, shape=(6,), dtype=np.uint32),
             "defense": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
             "speed": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
             "special": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
@@ -701,14 +701,14 @@ class RedGymEnv(Env):
     def set_perfect_iv_dvs(self):
         party_size = self.read_m("wPartyCount")
         for i in range(party_size):
-            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}Species")
+            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}Species")
             self.pyboy.memory[addr + 17 : addr + 17 + 12] = 0xFF
 
     def check_if_party_has_hm(self, hm: int) -> bool:
         party_size = self.read_m("wPartyCount")
         for i in range(party_size):
             # PRET 1-indexes
-            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}Moves")
+            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}Moves")
             if hm in self.pyboy.memory[addr : addr + 4]:
                 return True
         return False
@@ -882,7 +882,7 @@ class RedGymEnv(Env):
         party_size = self.read_m("wPartyCount")
         for i in range(party_size):
             # PRET 1-indexes
-            _, species_addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}Species")
+            _, species_addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}Species")
             poke = self.pyboy.memory[species_addr]
             # https://github.com/pret/pokered/blob/d38cf5281a902b4bd167a46a7c9fd9db436484a7/constants/pokemon_constants.asm
             if poke in CUT_SPECIES_IDS:
@@ -896,8 +896,8 @@ class RedGymEnv(Env):
             # PRET 1-indexes
             # https://github.com/pret/pokered/blob/d38cf5281a902b4bd167a46a7c9fd9db436484a7/constants/pokemon_constants.asm
             if self.party[i].Species in pokemon_species_ids:
-                _, move_addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}Moves")
-                _, pp_addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}PP")
+                _, move_addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}Moves")
+                _, pp_addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}PP")
                 for slot in range(4):
                     if self.party[i].Moves[slot] not in {
                         TmHmMoves.CUT.value,
@@ -1063,7 +1063,7 @@ class RedGymEnv(Env):
                 self.pyboy.button("DOWN", delay=8)
                 self.pyboy.tick(self.action_freq, self.animate_scripts)
                 party_mon = self.pyboy.memory[self.pyboy.symbol_lookup("wCurrentMenuItem")[1]]
-                _, addr = self.pyboy.symbol_lookup(f"wPartyMon{party_mon%6+1}Moves")
+                _, addr = self.pyboy.symbol_lookup(f"wPartyMon{party_mon % 6 + 1}Moves")
                 if 0xF in self.pyboy.memory[addr : addr + 4]:
                     break
 
@@ -1164,7 +1164,7 @@ class RedGymEnv(Env):
                     self.pyboy.send_input(WindowEvent.RELEASE_ARROW_DOWN, delay=8)
                     self.pyboy.tick(self.action_freq, self.animate_scripts)
                     party_mon = self.pyboy.memory[self.pyboy.symbol_lookup("wCurrentMenuItem")[1]]
-                    _, addr = self.pyboy.symbol_lookup(f"wPartyMon{party_mon%6+1}Moves")
+                    _, addr = self.pyboy.symbol_lookup(f"wPartyMon{party_mon % 6 + 1}Moves")
                     if 0x39 in self.pyboy.memory[addr : addr + 4]:
                         break
 
@@ -1487,7 +1487,7 @@ class RedGymEnv(Env):
             self.pyboy.memory[self.pyboy.symbol_lookup("wCurEnemyLevel")[1]] = 0x01
 
     def agent_stats(self, action):
-        levels = [self.read_m(f"wPartyMon{i+1}Level") for i in range(self.read_m("wPartyCount"))]
+        levels = [self.read_m(f"wPartyMon{i + 1}Level") for i in range(self.read_m("wPartyCount"))]
         badges = self.read_m("wObtainedBadges")
 
         _, wBagItems = self.pyboy.symbol_lookup("wBagItems")
@@ -1565,7 +1565,7 @@ class RedGymEnv(Env):
                     for tileset in Tilesets
                 }
             }
-            | {f"badge_{i+1}": bool(badges & (1 << i)) for i in range(8)},
+            | {f"badge_{i + 1}": bool(badges & (1 << i)) for i in range(8)},
             "events": {event: self.events.get_event(event) for event in REQUIRED_EVENTS}
             | {
                 "rival3": int(self.read_m(0xD665) == 4),
@@ -1751,7 +1751,10 @@ class RedGymEnv(Env):
         # opp_base_level = 5
         opponent_level = max(
             [0]
-            + [self.read_m(f"wEnemyMon{i+1}Level") for i in range(self.read_m("wEnemyPartyCount"))]
+            + [
+                self.read_m(f"wEnemyMon{i + 1}Level")
+                for i in range(self.read_m("wEnemyPartyCount"))
+            ]
         )
         # - opp_base_level
 
@@ -1783,7 +1786,7 @@ class RedGymEnv(Env):
         # TODO: Make a hook
         # Scan party
         for i in range(self.read_m("wPartyCount")):
-            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i+1}Moves")
+            _, addr = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}Moves")
             for move_id in self.pyboy.memory[addr : addr + 4]:
                 # if move_id in TM_HM_MOVES:
                 self.obtained_move_ids[move_id] = 1
@@ -1863,8 +1866,8 @@ class RedGymEnv(Env):
 
     def reverse_damage(self):
         for i in range(self.read_m("wPartyCount")):
-            _, wPartyMonHP = self.pyboy.symbol_lookup(f"wPartyMon{i+1}HP")
-            _, wPartymonMaxHP = self.pyboy.symbol_lookup(f"wPartyMon{i+1}MaxHP")
+            _, wPartyMonHP = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}HP")
+            _, wPartymonMaxHP = self.pyboy.symbol_lookup(f"wPartyMon{i + 1}MaxHP")
             self.pyboy.memory[wPartyMonHP] = 0
             self.pyboy.memory[wPartyMonHP + 1] = 128
             self.pyboy.memory[wPartymonMaxHP] = 0
@@ -1872,8 +1875,8 @@ class RedGymEnv(Env):
 
     def read_hp_fraction(self):
         party_size = self.read_m("wPartyCount")
-        hp_sum = sum(self.read_short(f"wPartyMon{i+1}HP") for i in range(party_size))
-        max_hp_sum = sum(self.read_short(f"wPartyMon{i+1}MaxHP") for i in range(party_size))
+        hp_sum = sum(self.read_short(f"wPartyMon{i + 1}HP") for i in range(party_size))
+        max_hp_sum = sum(self.read_short(f"wPartyMon{i + 1}MaxHP") for i in range(party_size))
         max_hp_sum = max(max_hp_sum, 1)
         return hp_sum / max_hp_sum
 

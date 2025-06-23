@@ -8,8 +8,6 @@ classifiers = [
 	"Operating System :: POSIX :: Linux",
 	"Operating System :: MacOS :: MacOS X",
 	"Programming Language :: Python",
-	"Programming Language :: Python :: 3.10",
-	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
 	"Programming Language :: Python :: Implementation :: CPython",
 ]
@@ -23,16 +21,16 @@ dependencies = [
     "psutil",
     "pyboy>=2",
     "pynvml",
-    "pufferlib @ git+https://github.com/thatguy11325/PufferLib.git@1.0",
+    "pufferlib @ git+https://github.com/PufferAI/PufferLib.git@3.0",
     "scikit-image",
     "torch>=2.4",
     "torchvision",
     "typer",
     "tyro",
     "wandb",
-    "websockets"
+    "websockets",
 ]
-requires-python = ">= 3.10"
+requires-python = ">= 3.12"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -52,7 +50,8 @@ test = [
 ]
 dev = [
     "pokemonred_puffer[test]",
-    "ruff"
+    "pre-commit>=4.2.0",
+    "ruff",
 ]
 
 [tool.distutils.bdist_wheel]
@@ -136,3 +135,6 @@ docstring-code-format = false
 # This only has an effect when the `docstring-code-format` setting is
 # enabled.
 docstring-code-line-length = "dynamic"
+
+[tool.uv]
+managed = true

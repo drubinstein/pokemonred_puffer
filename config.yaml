@@ -1,7 +1,8 @@
 wandb:
-  entity: thatguy11325
-  project: pokemon
-  group: ~
+  wandb_entity: thatguy11325
+  wandb_project: pokemon
+  wandb_group: ~
+  tag: null
 
 env:
   # If true, run without rendering every step.
@@ -85,7 +86,7 @@ env:
   # The scaling for visiting important map IDs.
   map_id_scalefactor: 9.539340019226074 # multiply map ids whose events have not been completed by 10
   # How many agents must reach a required event before all agents are allowed to continue.
-  # If an agent reaches a milestone and the required tolerance is not met, the episode will reset. 
+  # If an agent reaches a milestone and the required tolerance is not met, the episode will reset.
   required_tolerance: null
   # required_tolerance: 0.02
 
@@ -142,9 +143,7 @@ train:
   # Number of workers (processes) for training.
   # Environments are divided evenly across workers.
   num_workers: 24
-  # Number of workers to report per step. 
-  env_batch_size: 36
-  # Use PufferLib EnvPool
+  # Number of workers to report per step.
   env_pool: True
   # Use PufferLib's zero copy EnvPool.
   zero_copy: False
@@ -158,7 +157,7 @@ train:
   # How often to save checkpoints.
   checkpoint_interval: 200
 
-  # Log global map overlay to wandb 
+  # Log global map overlay to wandb
   save_overlay: True
   # How often to log global map to wandb.
   overlay_interval: 100
@@ -175,7 +174,7 @@ train:
   # Save PyBoy states when new required events and items are observed.
   archive_states: True
   # When a new required events and items are observed, move
-  # all environments to the save state for the environment that made 
+  # all environments to the save state for the environment that made
   # the observation
   swarm: True
   # event name: minutes. If we dont satisfy each condition
@@ -201,8 +200,7 @@ train:
 # The value for each key is the list of wrappers to support.
 # Wrappers can be found in the wrappers directory.
 wrappers:
-  empty:
-    - episode_stats.EpisodeStatsWrapper: {}
+  empty: []
 
   recorder:
     - coords_writer.CoordinatesWriter:
@@ -466,7 +464,6 @@ policies:
       args:
         input_size: 512
         hidden_size: 512
-        num_layers: 1
 
 # Debug overrides.
 debug:
@@ -506,15 +503,15 @@ debug:
     device: cpu
     compile: False
     compile_mode: default
-    num_envs: 1
-    envs_per_worker: 1
-    num_workers: 1
-    env_batch_size: 128
+    num_envs: 4
+    envs_per_worker: 2
+    num_workers: 2
     zero_copy: False
-    batch_size: 1024
-    minibatch_size: 128
+    batch_size: 2
+    minibatch_size: 2
+    max_minibatch_size: 2
     batch_rows: 4
-    bptt_horizon: 2
+    bptt_horizon: 1
     total_timesteps: 1_000_000
     save_checkpoint: True
     checkpoint_interval: 4
@@ -526,3 +523,14 @@ debug:
     async_wrapper: False
     sqlite_wrapper: False
     archive_states: False
+    optimizer: adam
+    learning_rate: 0.001
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    adam_eps: 1e-8
+    precision: float32
+    prio_alpha: 0.85
+    prio_beta0: 0.85
+    vf_coef: 0.5
+    vtrace_c_clip: 1
+    vtrace_rho_clip: 1
