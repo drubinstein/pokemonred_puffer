@@ -101,6 +101,7 @@ train:
   compile: True
   # The mode for torch compilation
   compile_mode: "reduce-overhead"
+  compile_fullgraph: False
   # Mostly useless for Pokemon, enables tensor cores on NVIDIA GPUs.
   float32_matmul_precision: "high"
   # The total time steps to run training for.
