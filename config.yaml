@@ -138,6 +138,16 @@ train:
   batch_rows: 128
   # backprop through time horizon.
   bptt_horizon: 16
+  optimizer: adam
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_eps: 1e-8
+  precision: float32
+  prio_alpha: 0.85
+  prio_beta0: 0.85
+  vf_coef: 0.5
+  vtrace_c_clip: 1
+  vtrace_rho_clip: 1
 
   # Number of environments for training.
   num_envs: 192
