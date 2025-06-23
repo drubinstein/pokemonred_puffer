@@ -63,8 +63,8 @@ class StateManager:
                         state_dir.mkdir(exist_ok=True)
                         with open(state_dir / "desc.txt", "w") as f:
                             f.write(str(key))
-                    with open(state_dir / f"{hash(v)}.state", "wb") as f:
-                        # take any of the states
+                    # take any of the states
+                    with open(state_dir / f"{hash(v[0])}.state", "wb") as f:
                         f.write(v[0])
             elif "stats/required_count" == k:
                 for count, eid in zip(v, env_ids):
