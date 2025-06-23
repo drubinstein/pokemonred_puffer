@@ -139,7 +139,7 @@ train:
   bptt_horizon: 16
 
   # Number of environments for training.
-  num_envs: 288
+  num_envs: 192
   # Number of workers (processes) for training.
   # Environments are divided evenly across workers.
   num_workers: 24
@@ -158,7 +158,7 @@ train:
   checkpoint_interval: 200
 
   # Log global map overlay to wandb
-  save_overlay: True
+  save_overlay: False
   # How often to log global map to wandb.
   overlay_interval: 100
   # Use PufferLib's CPU data offloading.

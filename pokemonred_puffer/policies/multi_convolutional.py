@@ -39,11 +39,11 @@ class MultiConvolutionalPolicy(nn.Module):
         self.channels_last = channels_last
         self.downsample = downsample
         self.screen_network = nn.Sequential(
-            nn.LazyConv2d(32, 8, stride=2),
+            nn.Conv2d(2, 32, 8, stride=2),
             nn.ReLU(),
-            nn.LazyConv2d(64, 4, stride=2),
+            nn.Conv2d(32, 64, 4, stride=2),
             nn.ReLU(),
-            nn.LazyConv2d(64, 3, stride=2),
+            nn.Conv2d(64, 64, 3, stride=2),
             nn.ReLU(),
             nn.Flatten(),
         )
@@ -51,12 +51,12 @@ class MultiConvolutionalPolicy(nn.Module):
         #     self.screen_network = self.screen_network.to(memory_format=torch.channels_last)
 
         self.encode_linear = nn.Sequential(
-            nn.LazyLinear(hidden_size),
+            nn.Linear(4225, hidden_size),
             nn.ReLU(),
         )
 
-        self.actor = nn.LazyLinear(self.num_actions)
-        self.value_fn = nn.LazyLinear(1)
+        self.actor = nn.Linear(hidden_size, self.num_actions)
+        self.value_fn = nn.Linear(hidden_size, 1)
 
         self.two_bit = env.unwrapped.env.two_bit
         self.skip_safari_zone = env.unwrapped.env.skip_safari_zone
@@ -64,14 +64,14 @@ class MultiConvolutionalPolicy(nn.Module):
 
         if self.use_global_map:
             self.global_map_network = nn.Sequential(
-                nn.LazyConv2d(32, 8, stride=4),
+                nn.Conv2d(1, 32, 8, stride=4),
                 nn.ReLU(),
-                nn.LazyConv2d(64, 4, stride=2),
+                nn.Conv2d(32, 64, 4, stride=2),
                 nn.ReLU(),
-                nn.LazyConv2d(64, 3, stride=1),
+                nn.Conv2d(64, 64, 3, stride=1),
                 nn.ReLU(),
                 nn.Flatten(),
-                nn.LazyLinear(480),
+                nn.Linear(64 * 2 * 2, 480),
                 nn.ReLU(),
             )
             # if channels_last:
@@ -115,7 +115,7 @@ class MultiConvolutionalPolicy(nn.Module):
         )
 
         # Party layers
-        self.party_network = nn.Sequential(nn.LazyLinear(6), nn.ReLU(), nn.Flatten())
+        self.party_network = nn.Sequential(nn.Linear(40, 6), nn.ReLU(), nn.Flatten())
         self.species_embeddings = nn.Embedding(0xBE, int(0xBE**0.25) + 1, dtype=torch.float32)
         self.type_embeddings = nn.Embedding(0x1A, int(0x1A**0.25) + 1, dtype=torch.float32)
         self.moves_embeddings = nn.Embedding(0xA4, int(0xA4**0.25) + 1, dtype=torch.float32)

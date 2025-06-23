@@ -16,7 +16,8 @@ import wandb
 
 from pokemonred_puffer.data.moves import Moves
 from pokemonred_puffer.data.species import Species
-from pokemonred_puffer.eval import make_pokemon_red_overlay
+
+# from pokemonred_puffer.eval import make_pokemon_red_overlay
 from pokemonred_puffer.wrappers.sqlite import SqliteStateResetWrapper
 
 
@@ -75,9 +76,10 @@ class StateManager:
             # You could also just return infos and have it in demo
             if "pokemon_exploration_map" in k and self.save_overlay is True:
                 if epoch % self.overlay_interval == 0:
-                    overlay = make_pokemon_red_overlay(np.stack(stats[k], axis=0))
-                    if self.wandb_enabled:
-                        stats["Media/aggregate_exploration_map"] = wandb.Image(overlay)
+                    pass
+                    # overlay = make_pokemon_red_overlay(np.stack(stats[k], axis=0))
+                    # if self.wandb_enabled:
+                    # stats["Media/aggregate_exploration_map"] = wandb.Image(overlay)
             elif any(s in k for s in ["state", "env_id", "species", "levels", "moves"]):
                 continue
             else:
