@@ -107,7 +107,7 @@ train:
   # The total time steps to run training for.
   total_timesteps: 10_000_000_000 # 100_000_000_000 for full games
   # The number of examples for one epoch of training.
-  batch_size: 65536
+  batch_size: "auto"
   # The number of example to train for one batch of training.
   minibatch_size: 2048
   max_minibatch_size: 2048
