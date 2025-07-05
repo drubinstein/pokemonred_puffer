@@ -1,11 +1,17 @@
-from ctypes import Structure, Union, c_uint16, c_uint8, sizeof
+from ctypes import (
+    BigEndianStructure,
+    Union,
+    c_uint16,
+    c_uint8,
+    sizeof,
+)
 
 from pyboy import PyBoy
 
 from pokemonred_puffer.data.species import Species
 
 
-class BoxStruct(Structure):
+class BoxStruct(BigEndianStructure):
     _pack_ = 1
     _fields_ = [
         ("Species", c_uint8),
@@ -28,9 +34,9 @@ class BoxStruct(Structure):
     ]
 
 
-class PartyStruct(Structure):
+class PartyStruct(BigEndianStructure):
     _pack_ = 1
-    _fields_ = BoxStruct._fields_ + [
+    _fields_ = BoxStruct._fields_ + [  # type: ignore
         ("Level", c_uint8),
         ("MaxHP", c_uint16),
         ("Attack", c_uint16),

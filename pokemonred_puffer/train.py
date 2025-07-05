@@ -14,6 +14,7 @@ import gymnasium
 import pufferlib
 import pufferlib.emulation
 import pufferlib.vector
+import torch
 import typer
 from omegaconf import DictConfig, OmegaConf
 from pufferlib.pufferl import PuffeRL, WandbLogger
@@ -91,7 +92,7 @@ def make_env_creator(
             env = SqliteStateResetWrapper(env, sqlite_config["database"])  # type: ignore
         if puffer_wrapper:
             env = pufferlib.emulation.GymnasiumPufferEnv(env=env, **kwargs)
-            env.is_observation_checked = True
+            # env.is_observation_checked = True
         return env
 
     return env_creator
@@ -424,6 +425,12 @@ def train(
                 },
             )
         trainer = PuffeRL(config=config.train, vecenv=vecenv, policy=policy, logger=logger)
+        if config.train.get("compile", False):
+            trainer.policy.forward_eval = torch.compile(  # type: ignore
+                trainer.policy.forward_eval,  # type: ignore
+                mode=config.train["compile_mode"],
+                fullgraph=config.train["compile_fullgraph"],
+            )
         state_manager = StateManager(
             sqlite_db=db_filename,
             env_send_queues=env_send_queues,  # type: ignore
@@ -440,11 +447,21 @@ def train(
         )
         epoch = 0
         while trainer.global_step < config.train["total_timesteps"]:
+            if config.train.get("compile", False):
+                for k in trainer.lstm_h:
+                    trainer.lstm_h[k] = trainer.lstm_h[k].clone()
+                    trainer.lstm_c[k] = trainer.lstm_c[k].clone()
+                torch.compiler.cudagraph_mark_step_begin()
             stats = trainer.evaluate()
             stats = state_manager.process_stats(stats, epoch)
             trainer.stats = stats
             state_manager.check_early_stop()
             state_manager.swarm(stats, vecenv)
+            if config.train.get("compile", False):
+                for k in trainer.lstm_h:
+                    trainer.lstm_h[k] = trainer.lstm_h[k].clone()
+                    trainer.lstm_c[k] = trainer.lstm_c[k].clone()
+                torch.compiler.cudagraph_mark_step_begin()
             trainer.train()
             epoch += 1
 

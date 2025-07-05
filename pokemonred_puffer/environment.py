@@ -222,7 +222,7 @@ class RedGymEnv(Env):
             "special": spaces.Box(low=0, high=714, shape=(6,), dtype=np.uint32),
             "moves": spaces.Box(low=0, high=0xA4, shape=(6, 4), dtype=np.uint8),
             # Add 4 for rival_3, game corner rocket, saffron guard and lapras
-            "events": spaces.Box(low=0, high=1, shape=(320,), dtype=np.uint8),
+            "events": spaces.Box(low=0, high=0xFF, shape=(320,), dtype=np.uint8),
             "rival_3": spaces.Box(low=0, high=1, shape=(1,), dtype=np.uint8),
             "game_corner_rocket": spaces.Box(low=0, high=1, shape=(1,), dtype=np.uint8),
             "saffron_guard": spaces.Box(low=0, high=1, shape=(1,), dtype=np.uint8),
@@ -656,13 +656,13 @@ class RedGymEnv(Env):
             self.screen_obs()
             | {
                 "direction": np.array(
-                    self.read_m("wSpritePlayerStateData1FacingDirection") // 4, dtype=np.uint8
+                    [self.read_m("wSpritePlayerStateData1FacingDirection") // 4], dtype=np.uint8
                 ),
-                "blackout_map_id": np.array(self.read_m("wLastBlackoutMap"), dtype=np.uint8),
-                "battle_type": np.array(self.read_m("wIsInBattle") + 1, dtype=np.uint8),
+                "blackout_map_id": np.array([self.read_m("wLastBlackoutMap")], dtype=np.uint8),
+                "battle_type": np.array([self.read_m("wIsInBattle") + 1], dtype=np.uint8),
                 # "x": np.array(player_x, dtype=np.uint8),
                 # "y": np.array(player_y, dtype=np.uint8),
-                "map_id": np.array(self.read_m(0xD35E), dtype=np.uint8),
+                "map_id": np.array([self.read_m(0xD35E)], dtype=np.uint8),
                 "bag_items": bag[::2].copy(),
                 "bag_quantity": bag[1::2].copy(),
                 "species": np.array([self.party[i].Species for i in range(6)], dtype=np.uint8),
@@ -679,21 +679,21 @@ class RedGymEnv(Env):
                 "moves": np.array([self.party[i].Moves for i in range(6)], dtype=np.uint8),
                 "events": np.array(self.events.asbytes, dtype=np.uint8),
                 "rival_3": np.array(
-                    self.read_m("wSSAnne2FCurScript") == 4, dtype=np.uint8
+                    [self.read_m("wSSAnne2FCurScript") == 4], dtype=np.uint8
                 ),  # rival 3
                 "game_corner_rocket": np.array(
-                    self.missables.get_missable("HS_GAME_CORNER_ROCKET"), np.uint8
+                    [self.missables.get_missable("HS_GAME_CORNER_ROCKET")], np.uint8
                 ),  # game corner rocket
                 "saffron_guard": np.array(
-                    self.flags.get_bit("BIT_GAVE_SAFFRON_GUARDS_DRINK"), np.uint8
+                    [self.flags.get_bit("BIT_GAVE_SAFFRON_GUARDS_DRINK")], dtype=np.uint8
                 ),  # saffron guard
-                "lapras": np.array(self.flags.get_bit("BIT_GOT_LAPRAS"), np.uint8),  # got lapras
+                "lapras": np.array([self.flags.get_bit("BIT_GOT_LAPRAS")], np.uint8),  # got lapras
             }
             | (
                 {}
                 if self.skip_safari_zone
                 else {
-                    "safari_steps": np.array(self.read_short("wSafariSteps"), dtype=np.uint32),
+                    "safari_steps": np.array([self.read_short("wSafariSteps")], dtype=np.uint32),
                 }
             )
         )

@@ -21,7 +21,7 @@ dependencies = [
     "psutil",
     "pyboy>=2",
     "pynvml",
-    "pufferlib @ git+https://github.com/PufferAI/PufferLib.git@3.0",
+    "pufferlib>=3",
     "scikit-image",
     "torch>=2.4",
     "torchvision",

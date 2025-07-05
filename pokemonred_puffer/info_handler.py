@@ -12,10 +12,6 @@ from typing import Any
 
 import numpy as np
 import pufferlib.vector
-import wandb
-
-from pokemonred_puffer.data.moves import Moves
-from pokemonred_puffer.data.species import Species
 
 # from pokemonred_puffer.eval import make_pokemon_red_overlay
 from pokemonred_puffer.wrappers.sqlite import SqliteStateResetWrapper
@@ -38,6 +34,7 @@ class StateManager:
     overlay_interval: int = 10
     required_rate: float | bool = False
     wandb_enabled: bool = False
+    max_event_count: int = 0
     uptime: int = 0
 
     def __post_init__(self):
@@ -72,6 +69,7 @@ class StateManager:
 
         stats = defaultdict(list, stats)
         # Add Pokemon specific stats
+        to_delete = []
         for k, v in stats.items():
             # Moves into models... maybe. Definitely moves.
             # You could also just return infos and have it in demo
@@ -82,36 +80,44 @@ class StateManager:
                     # if self.wandb_enabled:
                     # stats["Media/aggregate_exploration_map"] = wandb.Image(overlay)
             elif any(s in k for s in ["state", "env_id", "species", "levels", "moves"]):
-                continue
+                to_delete.append(k)
             else:
                 try:  # TODO: Better checks on log data types
-                    stats[k] = np.mean(v)
+                    stats[k] = v
                 except:  # noqa: E722
                     continue
 
+        for k in to_delete:
+            del stats[k]
+
+        """
         if (
             all(k in stats.keys() for k in ["env_ids", "species", "levels", "moves"])
-            and self.wandb_enabled is not None
+            and self.wandb_enabled
         ):
             table = {}
             # The infos are in order of when they were received so this _should_ work
-            for env_id, species, levels, moves in zip(
-                stats["env_ids"],
-                stats["species"],
-                stats["levels"],
-                stats["moves"],
-            ):
-                table[env_id] = [
-                    f"{Species(_species).name} @ {level} w/ {[Moves(move).name for move in _moves if move]}"
-                    if _species
-                    else ""
-                    for _species, level, _moves in zip(species, levels, moves)
-                ]
+            try:
+                for env_id, species, levels, moves in zip(
+                    stats["env_ids"],
+                    stats["species"],
+                    stats["levels"],
+                    stats["moves"],
+                ):
+                    table[env_id] = [
+                        f"{Species(_species).name} @ {level} w/ {[Moves(move).name for move in _moves if move]}"
+                        if _species
+                        else ""
+                        for _species, level, _moves in zip(species, levels, moves)
+                    ]
+            except:
+                breakpoint()
 
             stats["party/agents"] = wandb.Table(
                 columns=["env_id"] + [str(v) for v in range(6)],
                 data=[[str(k)] + v for k, v in table.items()],
             )
+        """
 
         return stats
 
