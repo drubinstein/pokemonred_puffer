@@ -248,7 +248,7 @@ class StateManager:
                 # Until then env ids are 1-indexed
                 print(f"\tNew events ({len(new_state_key)}): {new_state_key}")
                 new_states = [
-                    state
+                    random.choice(state)
                     for state in random.choices(
                         self.states[new_state_key], k=len(self.event_tracker.keys())
                     )
