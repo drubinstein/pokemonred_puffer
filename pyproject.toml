@@ -15,6 +15,7 @@ classifiers = [
 ]
 dependencies = [
     "einops",
+    "gymnasium",
     "mediapy",
     "numba",
     "numpy",

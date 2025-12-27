@@ -6,18 +6,93 @@ This repo is designed as a library to be used for Pokemon Red RL development. It
 
 ## Quickstart
 
-### Installation
+### 🧰 Requirements
 
-To install the library you can either
+- **Python 3.10/3.11**
+  *(Python 3.12 is **not** supported)*
+- `pip` (Python package installer)
+- `virtualenv` (optional but recommended)
+- System build tools and Python development headers
 
-1. Clone the repo to your local machine and install it.
-2. Fork the repo and clone your fork to your local machine.
+---
 
-For example,
+### 🛠 System Dependencies
 
-```sh
-pip3 install -e . 
+Native extensions require Python development headers and basic build tools. Install them using your system’s package manager.
+
+#### 🐧 Ubuntu / Debian
+
+You will need to add a PPA for Python versions which are not the latest and update your package list before being able to install Python3.10/Python3.11.
+
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.11-dev build-essential
 ```
+
+> Replace `python3.11-dev` with the appropriate version for your system if using a different Python version. E.g Python3.10
+
+#### 🐧 Arch Linux / Manjaro
+
+Arch Linux provides only the latest version of Python, so you must use the **AUR** (Arch User Repository) to install Python 3.10/Python 3.11.
+
+Install an AUR helper like `yay` if you haven’t already:
+
+```bash
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+```
+
+Install the aur package [Python 3.11](https://aur.archlinux.org/packages/python311)
+```bash
+yay -S python311
+```
+---
+
+### 🔧 Fix: antlr4-python3-runtime Build Issues
+
+Before installing, **upgrade `pip` and `setuptools`** to avoid errors when building some dependencies (like `antlr4-python3-runtime`):
+
+```bash
+pip install --upgrade pip setuptools
+```
+
+This resolves errors such as:
+
+```
+AttributeError: install_layout. Did you mean: 'install_platlib'?
+```
+
+> ⚠️ You may still see a warning about `setup.py install` being deprecated — this can usually be ignored if installation completes.
+
+---
+
+### 🐍 (Optional) Virtual Environment Setup & Sourcing
+
+Creating a virtual environment helps isolate dependencies, and prevent system-wide conflicts. The following will create a folder `.venv` for your dependencies. You should source this everytime.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Ensure `python3` points to Python 3.11 or earlier.
+
+---
+
+### 📦 Install the Project
+
+Install the project in **editable mode** to reflect changes immediately:
+
+```bash
+pip install -e .
+```
+
+This will install all dependencies listed in the `pyproject.toml`.
+
+---
 
 ### Running
 
